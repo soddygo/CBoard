@@ -5,6 +5,7 @@
         <div dnd-list="curWidget.config.values[0].cols"
              dnd-inserted="dndTransfer.toCol(curWidget.config.values[0].cols,index,item,type)"
              dnd-allowed-types="['measure','select','col','exp']"
+             ng-class="{highlight: targetHighlight.value}"
              class="form-control" style="min-height: 35px;height: auto;padding: 0px">
             <div class="dndPlaceholder sort-highlight"
                  style="height: 24px; width: 93px;margin: 3px 3px;display: inline-block;vertical-align: middle;">
@@ -23,6 +24,10 @@
                         <button type="button" class="btn btn-primary btn-sm dropdown-toggle"
                                 ng-click="editSort(o);cleanRowSort(o);">
                             <span class="fa" ng-class="{undefined:'fa-sort','asc':'fa-sort-asc','desc':'fa-sort-desc'}[o.sort]"></span>
+                        </button>
+                        <button type="button" class="btn btn-primary btn-sm dropdown-toggle"
+                                ng-click="editAlign(o)">
+                            <span class="fa" ng-class="{undefined:'fa-align-center','left':'fa-align-left','right':'fa-align-right'}[o.align]"></span>
                         </button>
                         <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown">
                             <span class="fa fa-edit"></span>
@@ -52,6 +57,10 @@
                         <button type="button" class="btn btn-default btn-sm dropdown-toggle"
                                 ng-click="editSort(o);cleanRowSort(o);">
                             <span class="fa" ng-class="{undefined:'fa-sort','asc':'fa-sort-asc','desc':'fa-sort-desc'}[o.sort]"></span>
+                        </button>
+                        <button type="button" class="btn btn-default btn-sm dropdown-toggle"
+                                ng-click="editAlign(o)">
+                            <span class="fa" ng-class="{undefined:'fa-align-center','left':'fa-align-left','right':'fa-align-right'}[o.align]"></span>
                         </button>
                         <button type="button" class="btn btn-default btn-sm dropdown-toggle"
                                 data-toggle="dropdown">

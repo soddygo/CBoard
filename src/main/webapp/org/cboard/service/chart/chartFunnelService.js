@@ -2,13 +2,16 @@
  * Created by yfyuan on 2016/10/28.
  */
 'use strict';
-cBoard.service('chartFunnelService', function () {
+cBoard.service('chartFunnelService', function ($state, $window) {
 
-    this.render = function (containerDom, option, scope, persist) {
-        return new CBoardEChartRender(containerDom, option).chart(null, persist);
+    this.render = function (containerDom, option, scope, persist, drill, relations, chartConfig) {
+        var render = new CBoardEChartRender(containerDom, option);
+        render.addClick(chartConfig, relations, $state, $window);
+        return render.chart(null, persist);
     };
 
     this.parseOption = function (data) {
+        var chartConfig = data.chartConfig;
         var casted_keys = data.keys;
         var casted_values = data.series;
         var aggregate_data = data.data;
@@ -75,6 +78,9 @@ cBoard.service('chartFunnelService', function () {
             toolbox: false,
             series: series
         };
+
+        updateEchartOptions(chartConfig.option, echartOption);
+
         return echartOption;
     };
 });

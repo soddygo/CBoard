@@ -56,9 +56,29 @@ cBoard.service('dataService', function ($http, $q, updateService) {
                                 c.exp = exp.exp;
                                 c.alias = exp.alias;
                             }
+                            // replace variable in exp
+                            c.exp = replaceVariable(dataset.data.expressions, c);
                         }
                     });
                 });
+                function replaceVariable(expList, exp) {
+                    var value = exp.exp;
+                    var loopCnt = 0;
+                    var context = {};
+                    for (var i = 0; i < expList.length; i++) {
+                        context[expList[i].alias] = expList[i].exp;
+                    }
+                    value = value.render2(context, function(v) {
+                        return '(' + v + ')';
+                    });
+                    while (value.match(/\$\{.*?\}/g) != null) {
+                        value = value.render2(context);
+                        if (loopCnt++ > 10) {
+                            throw 'Parser expresion [ ' + exp.exp + ' ] with error';
+                        }
+                    }
+                    return value;
+                }
                 //link dimension
                 var linkFunction = function (k) {
                     if (k.id) {
@@ -141,6 +161,7 @@ cBoard.service('dataService', function ($http, $q, updateService) {
             cfg.columns = getDimensionConfig(chartConfig.groups);
             cfg.filters = getDimensionConfig(chartConfig.filters);
             cfg.filters = cfg.filters.concat(getDimensionConfig(chartConfig.boardFilters));
+            cfg.filters = cfg.filters.concat(getDimensionConfig(chartConfig.boardWidgetFilters));
             cfg.values = _.map(dataSeries, function (s) {
                 return {column: s.name, aggType: s.aggregate};
             });

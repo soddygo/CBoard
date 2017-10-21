@@ -5,9 +5,11 @@
 cBoard.service('chartService', function ($q, dataService, chartPieService, chartLineService, chartFunnelService,
                                          chartSankeyService, chartTableService, chartKpiService, chartRadarService,
                                          chartMapService, chartScatterService, chartGaugeService, chartWordCloudService,
-                                         chartTreeMapService, chartAreaMapService ) {
+                                         chartTreeMapService, chartAreaMapService, chartHeatMapCalendarService, chartHeatMapTableService,
+                                         chartLiquidFillService, chartContrastService, chartChinaMapService, chartChinaMapBmapService,
+                                         chartRelationService ) {
 
-        this.render = function (containerDom, widget, optionFilter, scope, reload, persist) {
+        this.render = function (containerDom, widget, optionFilter, scope, reload, persist, relations) {
             var deferred = $q.defer();
             var chart = getChartServices(widget.config);
             dataService.getDataSeries(widget.datasource, widget.query, widget.datasetId, widget.config, function (data) {
@@ -84,7 +86,11 @@ cBoard.service('chartService', function ($q, dataService, chartPieService, chart
                         };
                     }
                 } finally {
-                    deferred.resolve(chart.render(containerDom, option, scope, persist, data.drill));
+                    if (widget.config.chart_type == 'chinaMapBmap') {
+                        chart.render(containerDom, option, scope, persist, data.drill);
+                    } else {
+                        deferred.resolve(chart.render(containerDom, option, scope, persist, data.drill, relations, widget.config));
+                    }
                 }
             }, reload);
             return deferred.promise;
@@ -100,7 +106,7 @@ cBoard.service('chartService', function ($q, dataService, chartPieService, chart
                 if (optionFilter) {
                     optionFilter(option);
                 }
-                realTimeTicket(option, data.drill.config);
+                realTimeTicket(option, data.drill ? data.drill.config : null);
             });
         };
 
@@ -145,6 +151,27 @@ cBoard.service('chartService', function ($q, dataService, chartPieService, chart
                     break;
                 case 'areaMap':
                     chart = chartAreaMapService;
+                    break;
+                case 'heatMapCalendar':
+                    chart = chartHeatMapCalendarService;
+                    break;
+                case 'heatMapTable':
+                    chart = chartHeatMapTableService;
+                    break;
+                case 'liquidFill':
+                    chart = chartLiquidFillService;
+                    break;
+                case 'contrast':
+                    chart = chartContrastService;
+                    break;
+                case 'chinaMap':
+                    chart = chartChinaMapService;
+                    break;
+                case 'chinaMapBmap':
+                    chart = chartChinaMapBmapService;
+                    break;
+                case 'relation':
+                    chart = chartRelationService;
                     break;
             }
             return chart;

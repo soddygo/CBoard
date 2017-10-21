@@ -85,9 +85,9 @@ var crossTable = {
         html = html + trDom + "</tbody></table>";
         var optionDom = "<select><option value='20'>20</option><option value='50'>50</option><option value='100'>100</option><option value='150'>150</option></select>";
         var p_class = "p_" + random;
-        var PaginationDom = "<div class='" + p_class + "'><div class='optionNum'><span>Show</span>" + optionDom + "<span>entries</span></div><div class='page'><ul></ul></div></div>";
+        var PaginationDom = "<div class='" + p_class + "'><div class='optionNum'><span>" + cboardTranslate("CROSS_TABLE.SHOW") + "</span>" + optionDom + "<span>" + cboardTranslate("CROSS_TABLE.ENTRIES") + "</span></div><div class='page'><ul></ul></div></div>";
         var operate = "<div class='toolbar toolbar" + random + "'><span class='info'><b>info: </b>" + rowNum + " x " + colNum + "</span>" +
-            "<span class='exportBnt' title='export'></span></div>";
+            "<span class='exportBnt' title='" + cboardTranslate("CROSS_TABLE.EXPORT") + "'></span></div>";
         $(container).html(operate);
         $(container).append("<div class='tableView table_" + random + "' style='width:99%;max-height:" + tall + "px;overflow:auto'>" + html + "</div>");
         $(container).append(PaginationDom);
@@ -99,11 +99,10 @@ var crossTable = {
         data.length ? this.renderPagination(dataPage.length, 1, pageObj, $('.' + p_class + ' .page>ul')[0]) : null;
         this.clickPageNum(dataPage, chartConfig, drill, p_class);
         this.clickNextPrev(dataPage.length, pageObj, p_class);
-        this.selectDataNum(data, chartConfig.groups.length + 1, chartConfig, drill, p_class);
+        this.selectDataNum(data, chartConfig.groups.length + 1, chartConfig, drill, p_class, "table_" + random, args.render);
         this.export(random, data);
-        this.clickDrill("table_" + random, drill, args.render);
     },
-    clickDrill: function (t_class, drill, render) {
+    bandDrillEvent: function (t_class, drill, render) {
         $('.' + t_class + ' .table_drill_cell[drill-down]').click(function(){
             var down = $(this).attr('drill-down');
             var value = $(this).html();
@@ -194,6 +193,7 @@ var crossTable = {
                 var rowParentCell = data[n][m - 1];
                 var cur_data = currentCell.data ? currentCell.data : "";
                 var keyId = chartConfig.keys[m].id;
+                var align = chartConfig.keys[m].align;
                 if (drill && drill.config[keyId] && (drill.config[keyId].down || drill.config[keyId].up)) {
                     var d = "";
                     if (drill.config[keyId].down) {
@@ -208,24 +208,25 @@ var crossTable = {
                     if (currentCell.rowSpan == 'row_null' && rowParentCell.rowSpan == 'row_null' && !isFirstLine) {
                         rowContent += "<th class=row_null><div></div></th>";
                     } else {
-                        rowContent += "<th class=row><div>" + cur_data + "</div></th>";
+                        rowContent += "<th style='text-align:"+align+"' class=row><div>" + cur_data + "</div></th>";
                     }
                 } else {
                     if (currentCell.rowSpan == 'row_null' && !isFirstLine) {
                         rowContent += "<th class=row_null><div></div></th>";
                     } else {
-                        rowContent += "<th class=row><div>" + cur_data + "</div></th>";
+                        rowContent += "<th style='text-align:"+align+"' class=row><div>" + cur_data + "</div></th>";
                     }
                 }
             }
             for (var y = chartConfig.keys.length; y < data[n].length; y++) {
-                rowContent += "<td class=" + data[n][m].property + "><div>" + data[n][y].data + "</div></td>";
+                var align = chartConfig.values[0].cols[(y-chartConfig.keys.length)%chartConfig.values[0].cols.length].align;
+                rowContent += "<td style='text-align:"+align+"'class=" + data[n][m].property + "><div>" + data[n][y].data + "</div></td>";
             }
             html = html + rowContent + "</tr>";
         }
         return html;
     },
-    selectDataNum: function (data, num, chartConfig, drill, random) {
+    selectDataNum: function (data, num, chartConfig, drill, random, t_class, render) {
         var _this = this;
         $('.' + random).on('change', '.optionNum select', function (e) {
             var pageDataNum = e.target.value;
@@ -236,7 +237,7 @@ var crossTable = {
             tbody.innerHTML = (_this.render(dataPage[0], chartConfig, drill));
             _this.renderPagination(dataPage.length, 1, null, dom);
             $('.' + random).off('click');
-            _this.clickPageNum(dataPage, chartConfig, random);
+            _this.clickPageNum(dataPage, chartConfig, drill, random);
             var pageObj = {
                 data: dataPage,
                 chartConfig: chartConfig,
@@ -244,6 +245,7 @@ var crossTable = {
             };
             _this.clickNextPrev(dataPage.length, pageObj, random);
         });
+        _this.bandDrillEvent(t_class, drill, render);
     },
     clickPageNum: function (data, chartConfig, drill, random) {
         var _this = this;
@@ -262,7 +264,10 @@ var crossTable = {
         });
     },
     renderPagination: function (pageCount, pageNumber, pageObj, target) {
-        var liStr = '<li><a class="previewLink">Preview</a></li>';
+        if (pageCount == 1) {
+            return  target.innerHTML = '';
+        }
+        var liStr = '<li><a class="previewLink">' + cboardTranslate("CROSS_TABLE.PREVIOUS_PAGE") + '</a></li>';
         if (pageCount < 10) {
             for (var a = 0; a < pageCount; a++) {
                 liStr += '<li><a class="pageLink">' + (a + 1) + '</a></li>';
@@ -299,7 +304,7 @@ var crossTable = {
                 }
             }
         }
-        liStr += '<li><a class="nextLink">Next</a></li>';
+        liStr += '<li><a class="nextLink">' + cboardTranslate("CROSS_TABLE.NEXT_PAGE") + '</a></li>';
         if (target) {
             target.innerHTML = liStr;
             if (pageNumber == 1) {

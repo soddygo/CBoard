@@ -12,7 +12,7 @@
             <option value="">选择省份/州</option>
         </select>
     </div>
-    <div class="col-md-3" ng-if="curWidget.config.province.code.length==2">
+    <div class="col-md-3" ng-if="cities.length>0">
         <select class="form-control" ng-model="curWidget.config.city.code" ng-init="setCities()"
                 ng-options="city.code as city.name for city in cities">
             <option value="">选择城市/县区</option>
@@ -28,6 +28,7 @@
              dnd-inserted="dndTransfer.toCol(curWidget.config.values[0].cols,index,item,type)"
              dnd-allowed-types="['measure','select','col','exp']"
              dnd-drop="curWidget.config.values[0].cols.length<1 ? item:false"
+             ng-class="{highlight: targetHighlight.value}"
              class="form-control" style="min-height: 35px;height: auto;padding: 0px">
             <div class="dndPlaceholder sort-highlight"
                  style="height: 24px; width: 93px;margin: 3px 3px;display: inline-block;vertical-align: middle;">

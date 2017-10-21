@@ -16,8 +16,22 @@
         <jackson.version>1.9.10</jackson.version>
         <jdk.version>1.8</jdk.version>
         <presto.version>0.161</presto.version>
+        <h2.version>1.4.196</h2.version>
     </properties>
+
+    <repositories>
+        <repository>
+            <id>aliyun</id>
+            <url>http://maven.aliyun.com/nexus/content/groups/public</url>
+        </repository>
+    </repositories>
+
     <dependencies>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>${h2.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
@@ -26,6 +40,11 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
             <version>${spring.version}</version>
         </dependency>
         <dependency>
@@ -271,7 +290,12 @@
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
-            <version>3.15</version>
+            <version>3.16</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>3.16</version>
         </dependency>
         <dependency>
             <groupId>org.quartz-scheduler</groupId>
@@ -308,6 +332,11 @@
             <artifactId>hessian</artifactId>
             <version>4.0.38</version>
         </dependency>
+        <dependency>
+            <groupId>com.microsoft.ews-java-api</groupId>
+            <artifactId>ews-java-api</artifactId>
+            <version>2.0</version>
+        </dependency>
 
         <!-- https://mvnrepository.com/artifact/au.com.bytecode/opencsv -->
         <dependency>
@@ -315,6 +344,19 @@
             <artifactId>opencsv</artifactId>
             <version>2.4</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-dbcp2</artifactId>
+            <version>2.1.1</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.jayway.jsonpath/json-path -->
+        <dependency>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path</artifactId>
+            <version>2.4.0</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -334,4 +376,41 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>env</id>
+            <activation>
+                <property>
+                    <name>env</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <version>2.6</version>
+                        <executions>
+                            <execution>
+                                <id>copy-resources</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>src/main/resources/${env}</directory>
+                                            <filtering>false</filtering>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
